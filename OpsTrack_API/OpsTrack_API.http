@@ -1,0 +1,6 @@
+@OpsTrack_API_HostAddress = http://localhost:5052
+
+GET {{OpsTrack_API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

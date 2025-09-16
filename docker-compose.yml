@@ -1,0 +1,6 @@
+services:
+  opstrack_api:
+    image: ${DOCKER_REGISTRY-}opstrackapi
+    build:
+      context: .
+      dockerfile: OpsTrack_API/Dockerfile
