@@ -16,12 +16,9 @@ builder.Services.AddDbContext<OpsTrackContext>(options =>
 
 var app = builder.Build();
 
-// Slå Swagger til i Development
-if (app.Environment.IsDevelopment())
-{
+// Slå Swagger til
     app.UseSwagger();
     app.UseSwaggerUI();
-}
 
 // Dine endpoints
 app.MapPost("/player/join", async (PlayerEvent ev, OpsTrackContext db) =>
