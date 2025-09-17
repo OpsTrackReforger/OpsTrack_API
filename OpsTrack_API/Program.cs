@@ -6,21 +6,23 @@ using OpsTrack_API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Tilføj services til Swagger
+// Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Tilføj DbContext (som du allerede har)
+// Add DbContext with SQLite
 builder.Services.AddDbContext<OpsTrackContext>(options =>
     options.UseSqlite("Data Source=opstrack.db"));
 
 var app = builder.Build();
 
-// Slå Swagger til
-    app.UseSwagger();
+// Enable swagger (Should it only be enabled in development?)
+app.UseSwagger();
     app.UseSwaggerUI();
 
-// Dine endpoints
+// End points
+
+// Player join event
 app.MapPost("/player/join", async (PlayerEvent ev, OpsTrackContext db) =>
 {
     ev.EventType = "join";
@@ -30,6 +32,7 @@ app.MapPost("/player/join", async (PlayerEvent ev, OpsTrackContext db) =>
     return Results.Ok(ev);
 });
 
+// Player leave event
 app.MapPost("/player/leave", async (PlayerEvent ev, OpsTrackContext db) =>
 {
     ev.EventType = "leave";
@@ -39,6 +42,7 @@ app.MapPost("/player/leave", async (PlayerEvent ev, OpsTrackContext db) =>
     return Results.Ok(ev);
 });
 
+// Get all events
 app.MapGet("/events", async (OpsTrackContext db) =>
     await db.PlayerEvents.ToListAsync());
 
