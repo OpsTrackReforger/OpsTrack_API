@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpsTrack_API.Data;
 
@@ -10,9 +11,11 @@ using OpsTrack_API.Data;
 namespace OpsTrack_API.Migrations
 {
     [DbContext(typeof(OpsTrackContext))]
-    partial class OpsTrackContextModelSnapshot : ModelSnapshot
+    [Migration("20250918194205_ChangePlayerIDToGameIdentityFIX")]
+    partial class ChangePlayerIDToGameIdentityFIX
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");

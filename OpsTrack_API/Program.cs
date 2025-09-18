@@ -1,6 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using OpsTrack_API.Data;
-using OpsTrack_API.Models;
+﻿using Microsoft.EntityFrameworkCore;
 using OpsTrack_API.Data;
 using OpsTrack_API.Models;
 
@@ -16,34 +14,37 @@ builder.Services.AddDbContext<OpsTrackContext>(options =>
 
 var app = builder.Build();
 
-// Enable swagger (Should it only be enabled in development?)
+// Run migrations at startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<OpsTrackContext>();
+    db.Database.Migrate();
+}
+
+// Enable swagger
 app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwaggerUI();
 
-// End points
-
-// Player join event
-app.MapPost("/player/join", async (PlayerEvent ev, OpsTrackContext db) =>
+// Endpoints
+app.MapPost("/player/join", async (ConnectionEvent ev, OpsTrackContext db) =>
 {
     ev.EventType = "join";
     ev.Timestamp = DateTime.UtcNow;
-    db.PlayerEvents.Add(ev);
+    db.ConnectionEvents.Add(ev);
     await db.SaveChangesAsync();
     return Results.Ok(ev);
 });
 
-// Player leave event
-app.MapPost("/player/leave", async (PlayerEvent ev, OpsTrackContext db) =>
+app.MapPost("/player/leave", async (ConnectionEvent ev, OpsTrackContext db) =>
 {
     ev.EventType = "leave";
     ev.Timestamp = DateTime.UtcNow;
-    db.PlayerEvents.Add(ev);
+    db.ConnectionEvents.Add(ev);
     await db.SaveChangesAsync();
     return Results.Ok(ev);
 });
 
-// Get all events
 app.MapGet("/events", async (OpsTrackContext db) =>
-    await db.PlayerEvents.ToListAsync());
+    await db.ConnectionEvents.ToListAsync());
 
 app.Run();
