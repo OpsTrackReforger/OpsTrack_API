@@ -1,6 +1,4 @@
-﻿
-
-namespace OpsTrack_API.Models
+﻿namespace OpsTrack_API.Models
 {
     public class ConnectionEvent
     {
