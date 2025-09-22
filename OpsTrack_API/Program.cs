@@ -1,7 +1,11 @@
 ﻿using Application.Dtos;
+using Application.Enums;
+using Application.Services;
 using Domain.Entities;
+using Domain.Repositories;
+using Infrastructure.Data;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using OpsTrack_API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +17,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<OpsTrackContext>(options =>
     options.UseSqlite("Data Source=opstrack.db"));
 
+//Add repositories and services
+builder.Services.AddScoped<IPlayerRepository, EfPlayerRepository>();
+builder.Services.AddScoped<IConnectionEventRepository, EfConnectionEventRepository>();
+builder.Services.AddScoped<IConnectionEventService, ConnectionEventService>();
 var app = builder.Build();
+
 app.UseDeveloperExceptionPage();
 
 // Run migrations at startup
@@ -29,116 +38,32 @@ app.UseSwaggerUI();
 
 // Endpoints
 // POST: /player/join
-app.MapPost("/player/join", async (PlayerEventRequest req, OpsTrackContext db) =>
+app.MapPost("/player/join", async (PlayerEventRequest req, IConnectionEventService service) =>
 {
-    var ev = new ConnectionEvent
-    {
-        GameIdentity = req.GameIdentity,
-        Name = req.Name,
-        EventType = "join",
-        Timestamp = DateTime.UtcNow
-    };
-
-    // Find eller opret Player
-    var player = await db.Players.FindAsync(ev.GameIdentity);
-    if (player == null)
-    {
-        player = new Player
-        {
-            GameIdentity = ev.GameIdentity,
-            LastKnownName = ev.Name,
-            FirstSeen = ev.Timestamp,
-            LastSeen = ev.Timestamp
-        };
-        db.Players.Add(player);
-    }
-    else
-    {
-        player.LastKnownName = ev.Name;
-        player.LastSeen = ev.Timestamp;
-    }
-
-    db.ConnectionEvents.Add(ev);
-    await db.SaveChangesAsync();
-
-    return Results.Ok(new ConnectionEventResponse(
-            ev.EventId,
-            ev.GameIdentity,
-            ev.Name,
-            ev.EventType,
-            ev.Timestamp
-        ));
+    var result = await service.RegisterConnectionEventAsync(
+        req.GameIdentity,
+        req.Name,
+        ConnectionEventType.JOIN
+    );
+    return Results.Ok(result);
 });
 
-
-
-// POST: /player/leave
-app.MapPost("/player/leave", async (PlayerEventRequest req, OpsTrackContext db) =>
+app.MapPost("/player/leave", async (PlayerEventRequest req, IConnectionEventService service) =>
 {
-    var ev = new ConnectionEvent()
-    {
-        GameIdentity = req.GameIdentity,
-        Name = req.Name,
-        EventType = "leave",
-        Timestamp = DateTime.UtcNow
-    };
-
-    var player = await db.Players.FindAsync(ev.GameIdentity);
-    if (player != null)
-    {
-        player.LastSeen = ev.Timestamp;
-    }
-
-    db.ConnectionEvents.Add(ev);
-    await db.SaveChangesAsync();
-
-    return Results.Ok(new ConnectionEventResponse(
-        ev.EventId,
-        ev.GameIdentity,
-        ev.Name,
-        ev.EventType,
-        ev.Timestamp
-    ));
+    var result = await service.RegisterConnectionEventAsync(
+        req.GameIdentity,
+        req.Name,
+        ConnectionEventType.LEAVE
+    );
+    return Results.Ok(result);
 });
+
 
 //GET: /events/connections
 app.MapGet("/events/connections", async (OpsTrackContext db) =>
     await db.ConnectionEvents
         .AsNoTracking()
         .OrderByDescending(e => e.Timestamp)
-        .Select(e => new ConnectionEventResponse(
-            e.EventId,
-            e.GameIdentity,
-            e.Name,
-            e.EventType,
-            e.Timestamp
-        ))
-        .ToListAsync());
-
-
-//GET: /events/connections/{id}
-app.MapGet("/events/connections/{id}", async (string id, OpsTrackContext db) =>
-    await db.ConnectionEvents
-        .Where(e => e.GameIdentity == id)
-        .Include(e => e.Player)
-        .AsNoTracking()
-        .Select(e => new ConnectionEventResponse(
-            e.EventId,
-            e.GameIdentity,
-            e.Name,
-            e.EventType,
-            e.Timestamp
-        ))
-        .OrderByDescending(e => e.Timestamp)
-        .ToListAsync());
-
-//GET: /events/connections/latest/{count}
-app.MapGet("/events/connections/latest/{count:int}", async (int count, OpsTrackContext db) =>
-    await db.ConnectionEvents
-        .OrderByDescending(e => e.Timestamp)
-        .Include(e => e.Player)
-        .AsNoTracking()
-        .Take(count)
         .Select(e => new ConnectionEventResponse(
             e.EventId,
             e.GameIdentity,
@@ -160,24 +85,6 @@ app.MapGet("/players", async (OpsTrackContext db) =>
         p.LastSeen
     ))
     .ToListAsync());
-
-// GET: /players/{id}
-app.MapGet("/players/{id}", async (string id, OpsTrackContext db) =>
-{
-    var player = await db.Players
-        .AsNoTracking()
-        .FirstOrDefaultAsync(p => p.GameIdentity == id);
-
-    return player is not null
-        ? Results.Ok(new PlayerResponse(
-            player.GameIdentity,
-            player.LastKnownName,
-            player.FirstSeen,
-            player.LastSeen
-          ))
-        : Results.NotFound();
-});
-
 
 
 app.Run();
