@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace OpsTrack_API.Migrations
+namespace Infrastructure.Migrations
 {
     [DbContext(typeof(OpsTrackContext))]
-    [Migration("20250919191452_someNewMigrationToDebug")]
-    partial class someNewMigrationToDebug
+    [Migration("20250922191410_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,7 +20,7 @@ namespace OpsTrack_API.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
 
-            modelBuilder.Entity("OpsTrack_API.Models.ConnectionEvent", b =>
+            modelBuilder.Entity("Domain.Entities.ConnectionEvent", b =>
                 {
                     b.Property<int>("EventId")
                         .ValueGeneratedOnAdd()
@@ -48,7 +48,7 @@ namespace OpsTrack_API.Migrations
                     b.ToTable("ConnectionEvents");
                 });
 
-            modelBuilder.Entity("OpsTrack_API.Models.Player", b =>
+            modelBuilder.Entity("Domain.Entities.Player", b =>
                 {
                     b.Property<string>("GameIdentity")
                         .HasColumnType("TEXT");
@@ -68,9 +68,9 @@ namespace OpsTrack_API.Migrations
                     b.ToTable("Players");
                 });
 
-            modelBuilder.Entity("OpsTrack_API.Models.ConnectionEvent", b =>
+            modelBuilder.Entity("Domain.Entities.ConnectionEvent", b =>
                 {
-                    b.HasOne("OpsTrack_API.Models.Player", "Player")
+                    b.HasOne("Domain.Entities.Player", "Player")
                         .WithMany("ConnectionEvents")
                         .HasForeignKey("GameIdentity")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -79,7 +79,7 @@ namespace OpsTrack_API.Migrations
                     b.Navigation("Player");
                 });
 
-            modelBuilder.Entity("OpsTrack_API.Models.Player", b =>
+            modelBuilder.Entity("Domain.Entities.Player", b =>
                 {
                     b.Navigation("ConnectionEvents");
                 });

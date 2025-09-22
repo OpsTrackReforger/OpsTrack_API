@@ -3,24 +3,21 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace OpsTrack_API.Migrations
+namespace Infrastructure.Migrations
 {
     [DbContext(typeof(OpsTrackContext))]
-    [Migration("20250919183907_AddPlayersAndConnectionEvents")]
-    partial class AddPlayersAndConnectionEvents
+    partial class OpsTrackContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
 
-            modelBuilder.Entity("OpsTrack_API.Models.ConnectionEvent", b =>
+            modelBuilder.Entity("Domain.Entities.ConnectionEvent", b =>
                 {
                     b.Property<int>("EventId")
                         .ValueGeneratedOnAdd()
@@ -48,7 +45,7 @@ namespace OpsTrack_API.Migrations
                     b.ToTable("ConnectionEvents");
                 });
 
-            modelBuilder.Entity("OpsTrack_API.Models.Player", b =>
+            modelBuilder.Entity("Domain.Entities.Player", b =>
                 {
                     b.Property<string>("GameIdentity")
                         .HasColumnType("TEXT");
@@ -68,9 +65,9 @@ namespace OpsTrack_API.Migrations
                     b.ToTable("Players");
                 });
 
-            modelBuilder.Entity("OpsTrack_API.Models.ConnectionEvent", b =>
+            modelBuilder.Entity("Domain.Entities.ConnectionEvent", b =>
                 {
-                    b.HasOne("OpsTrack_API.Models.Player", "Player")
+                    b.HasOne("Domain.Entities.Player", "Player")
                         .WithMany("ConnectionEvents")
                         .HasForeignKey("GameIdentity")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -79,7 +76,7 @@ namespace OpsTrack_API.Migrations
                     b.Navigation("Player");
                 });
 
-            modelBuilder.Entity("OpsTrack_API.Models.Player", b =>
+            modelBuilder.Entity("Domain.Entities.Player", b =>
                 {
                     b.Navigation("ConnectionEvents");
                 });
