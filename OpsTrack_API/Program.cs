@@ -1,7 +1,7 @@
-﻿using Domain.Entities;
+﻿using Application.Dtos;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using OpsTrack_API.Data;
-using OpsTrack_API.Dtos;
 
 var builder = WebApplication.CreateBuilder(args);
 
