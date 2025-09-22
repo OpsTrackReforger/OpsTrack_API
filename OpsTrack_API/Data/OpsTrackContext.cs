@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OpsTrack_API.Models;
+﻿using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace OpsTrack_API.Data
 {
