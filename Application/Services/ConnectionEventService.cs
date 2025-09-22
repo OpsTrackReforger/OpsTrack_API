@@ -2,6 +2,7 @@
 using Application.Enums;
 using Domain.Entities;
 using Domain.Repositories;
+
 namespace Application.Services
 {
     public class ConnectionEventService : IConnectionEventService
@@ -63,5 +64,21 @@ namespace Application.Services
                 ev.Timestamp
             );
         }
+
+        public async Task<IEnumerable<ConnectionEventResponse>> GetAllAsync()
+        {
+            var events = await _eventRepository.GetAllAsync();
+
+            return events.Select(e => new ConnectionEventResponse(
+                e.EventId,
+                e.GameIdentity,
+                e.Name,
+                e.EventType,
+                e.Timestamp
+            ));
+        }
+
+
+
     }
 }

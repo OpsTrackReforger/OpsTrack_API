@@ -30,10 +30,17 @@ namespace Infrastructure.Repositories
                 .AsNoTracking()
                 .ToListAsync();
 
+        public async Task<IEnumerable<ConnectionEvent>> GetAllAsync() =>
+            await _context.ConnectionEvents
+                .OrderByDescending(e => e.Timestamp)
+                .AsNoTracking()
+                .ToListAsync();
+
         public async Task AddAsync(ConnectionEvent connectionEvent) =>
             await _context.ConnectionEvents.AddAsync(connectionEvent);
 
         public async Task SaveChangesAsync() =>
             await _context.SaveChangesAsync();
+
     }
 }

@@ -8,6 +8,7 @@ namespace Domain.Repositories
         Task<IEnumerable<ConnectionEvent>> GetByPlayerIdAsync(string gameIdentity);
         Task<IEnumerable<ConnectionEvent>> GetLatestAsync(int count);
         Task AddAsync(ConnectionEvent connectionEvent);
+        Task<IEnumerable<ConnectionEvent>> GetAllAsync();
         Task SaveChangesAsync();
     }
 }

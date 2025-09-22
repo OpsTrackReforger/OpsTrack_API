@@ -11,6 +11,7 @@ namespace Application.Services
     public interface IConnectionEventService
     {
         Task<ConnectionEventResponse> RegisterConnectionEventAsync(string gameIdentity, string name, ConnectionEventType type);
+        Task<IEnumerable<ConnectionEventResponse>> GetAllAsync();
 
     }
 }
