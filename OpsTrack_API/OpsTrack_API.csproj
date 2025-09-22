@@ -25,4 +25,8 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="D:\Workspace\OpsTrack_API\Domain\Domain.csproj" />
+  </ItemGroup>
+
 </Project>
