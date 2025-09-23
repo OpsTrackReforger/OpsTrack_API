@@ -9,13 +9,22 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var solutionRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\.."));
+// Dette giver: C:\Users\Christopher\source\repos\OpsTrackReforger\OpsTrack_API
+
+var dataPath = Path.Combine(solutionRoot, "Data");
+Directory.CreateDirectory(dataPath);
+
+var connectionString = $"Data Source={Path.Combine(dataPath, "opstrack.db")}";
+
+
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add DbContext with SQLite
 builder.Services.AddDbContext<OpsTrackContext>(options =>
-    options.UseSqlite("Data Source=opstrack.db"));
+    options.UseSqlite(connectionString));
 
 //Add repositories and services
 builder.Services.AddScoped<IPlayerRepository, EfPlayerRepository>();
