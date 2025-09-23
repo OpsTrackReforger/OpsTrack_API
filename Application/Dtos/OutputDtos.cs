@@ -1,9 +1,11 @@
-﻿namespace OpsTrack_API.Dtos
-{
-    //Input
-    public record PlayerEventRequest(string GameIdentity, string Name);
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-    //Output
+namespace Application.Dtos
+{
     public record ConnectionEventResponse(
         int EventId,
         string GameIdentity,
@@ -18,5 +20,4 @@
         DateTime FirstSeen,
         DateTime LastSeen
     );
-
 }

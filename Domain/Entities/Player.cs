@@ -1,4 +1,4 @@
-﻿namespace OpsTrack_API.Models
+﻿namespace Domain.Entities
 {
     public class Player
     {
