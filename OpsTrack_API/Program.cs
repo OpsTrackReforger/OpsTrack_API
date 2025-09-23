@@ -9,22 +9,37 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var solutionRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\.."));
-// Dette giver: C:\Users\Christopher\source\repos\OpsTrackReforger\OpsTrack_API
-
-var dataPath = Path.Combine(solutionRoot, "Data");
-Directory.CreateDirectory(dataPath);
-
-var connectionString = $"Data Source={Path.Combine(dataPath, "opstrack.db")}";
 
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add DbContext with SQLite
-builder.Services.AddDbContext<OpsTrackContext>(options =>
-    options.UseSqlite(connectionString));
+var provider = builder.Configuration["DatabaseProvider"];
+
+if (provider == "MySql")
+{
+    var cs = builder.Configuration.GetConnectionString("MySql");
+    builder.Services.AddDbContext<OpsTrackContext>(options =>
+        options.UseMySql(cs, ServerVersion.AutoDetect(cs)));
+}
+else if (provider == "SqlServer")
+{
+    var cs = builder.Configuration.GetConnectionString("SqlServer");
+    builder.Services.AddDbContext<OpsTrackContext>(options =>
+        options.UseSqlServer(cs));
+}
+else // default til Sqlite
+{
+    //SqLite datapath is always in solution folder /Data
+    var solutionRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\.."));
+    var dataPath = Path.Combine(solutionRoot, "Data");
+    Directory.CreateDirectory(dataPath);
+    var connectionString = $"Data Source={Path.Combine(dataPath, "opstrack.db")}";
+
+    builder.Services.AddDbContext<OpsTrackContext>(options =>
+        options.UseSqlite(connectionString));
+}
 
 //Add repositories and services
 builder.Services.AddScoped<IPlayerRepository, EfPlayerRepository>();
