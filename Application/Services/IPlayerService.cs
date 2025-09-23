@@ -10,5 +10,6 @@ namespace Application.Services
     public interface IPlayerService
     {
         Task<IEnumerable<PlayerResponse>> GetAllAsync();
+        Task<IEnumerable<PlayerResponse>> GetOnline();
     }
 }

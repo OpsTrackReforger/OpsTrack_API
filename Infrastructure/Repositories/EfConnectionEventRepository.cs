@@ -29,6 +29,11 @@ namespace Infrastructure.Repositories
                 .Take(count)
                 .AsNoTracking()
                 .ToListAsync();
+        public async Task<IEnumerable<ConnectionEvent>> GetLAtestEventsByPlayerAsync() =>
+            await _context.ConnectionEvents
+                .GroupBy(e => e.GameIdentity)
+                .Select(g => g.OrderByDescending(e => e.Timestamp).FirstOrDefault())
+                .ToListAsync();
 
         public async Task<IEnumerable<ConnectionEvent>> GetAllAsync() =>
             await _context.ConnectionEvents

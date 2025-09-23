@@ -24,6 +24,8 @@ namespace Infrastructure.Repositories
         public async Task AddAsync(Player player) =>
             await _context.Players.AddAsync(player);
 
+        
+
         public Task UpdateAsync(Player player)
         {
             _context.Players.Update(player);

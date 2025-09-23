@@ -30,6 +30,22 @@ namespace Application.Services
                 p.LastSeen
                 ));
         }
+
+        public async Task<IEnumerable<PlayerResponse>> GetOnline()
+        {
+            var latestEvents = await _eventRepository.GetLAtestEventsByPlayerAsync();
+
+            var onlinePlayers = latestEvents
+                .Where(e => e != null && e.EventType == "join") // kun spillere der sidst joinede
+                .Select(e => new PlayerResponse(
+                    e.GameIdentity,
+                    e.Name,
+                    e.Timestamp, // evt. FirstSeen kan hentes fra Player
+                    e.Timestamp  // LastSeen, kan også hentes fra Player
+                ));
+
+            return onlinePlayers;
+        }
     }
 }
 
