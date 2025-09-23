@@ -21,6 +21,7 @@ builder.Services.AddDbContext<OpsTrackContext>(options =>
 builder.Services.AddScoped<IPlayerRepository, EfPlayerRepository>();
 builder.Services.AddScoped<IConnectionEventRepository, EfConnectionEventRepository>();
 builder.Services.AddScoped<IConnectionEventService, ConnectionEventService>();
+builder.Services.AddControllers();
 var app = builder.Build();
 
 app.UseDeveloperExceptionPage();
@@ -36,55 +37,6 @@ using (var scope = app.Services.CreateScope())
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Endpoints
-// POST: /player/join
-app.MapPost("/player/join", async (PlayerEventRequest req, IConnectionEventService service) =>
-{
-    var result = await service.RegisterConnectionEventAsync(
-        req.GameIdentity,
-        req.Name,
-        ConnectionEventType.JOIN
-    );
-    return Results.Ok(result);
-});
-
-app.MapPost("/player/leave", async (PlayerEventRequest req, IConnectionEventService service) =>
-{
-    var result = await service.RegisterConnectionEventAsync(
-        req.GameIdentity,
-        req.Name,
-        ConnectionEventType.LEAVE
-    );
-    return Results.Ok(result);
-});
-
-
-//GET: /events/connections
-app.MapGet("/events/connections", async (OpsTrackContext db) =>
-    await db.ConnectionEvents
-        .AsNoTracking()
-        .OrderByDescending(e => e.Timestamp)
-        .Select(e => new ConnectionEventResponse(
-            e.EventId,
-            e.GameIdentity,
-            e.Name,
-            e.EventType,
-            e.Timestamp
-        ))
-        .ToListAsync());
-
-
-// GET: /players
-app.MapGet("/players", async (OpsTrackContext db) =>
-    await db.Players
-    .AsNoTracking()
-    .Select(p => new PlayerResponse(
-        p.GameIdentity,
-        p.LastKnownName,
-        p.FirstSeen,
-        p.LastSeen
-    ))
-    .ToListAsync());
-
+app.MapControllers();
 
 app.Run();
