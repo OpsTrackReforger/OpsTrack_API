@@ -45,6 +45,7 @@ else // default til Sqlite
 builder.Services.AddScoped<IPlayerRepository, EfPlayerRepository>();
 builder.Services.AddScoped<IConnectionEventRepository, EfConnectionEventRepository>();
 builder.Services.AddScoped<IConnectionEventService, ConnectionEventService>();
+builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddControllers();
 var app = builder.Build();
 

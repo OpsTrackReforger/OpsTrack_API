@@ -1,5 +1,4 @@
 ﻿using Application.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace OpsTrack_API.Controllers
@@ -8,12 +7,10 @@ namespace OpsTrack_API.Controllers
     [Route("players")]
     public class PlayersController : ControllerBase
     {
-        private readonly IConnectionEventService _eventService;
         private readonly IPlayerService _playerService;
 
-        public PlayersController(IConnectionEventService eventService, IPlayerService playerService)
+        public PlayersController(IPlayerService playerService)
         {
-            _eventService = eventService;
             _playerService = playerService;
         }
 
@@ -21,7 +18,7 @@ namespace OpsTrack_API.Controllers
         [HttpGet("All")]
         public async Task<IActionResult> GetAll()
         {
-            var result = await _eventService.GetAllAsync();
+            var result = await _playerService.GetAllAsync();
             return Ok(result);
         }
 
