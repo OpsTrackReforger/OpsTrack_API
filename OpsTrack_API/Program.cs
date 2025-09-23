@@ -1,11 +1,9 @@
-﻿using Application.Dtos;
-using Application.Enums;
-using Application.Services;
-using Domain.Entities;
+﻿using Application.Services;
 using Domain.Repositories;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 

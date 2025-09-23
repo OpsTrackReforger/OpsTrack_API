@@ -1,5 +1,7 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer;
+using Pomelo.EntityFrameworkCore.MySql;
 
 namespace Infrastructure.Data
 {
