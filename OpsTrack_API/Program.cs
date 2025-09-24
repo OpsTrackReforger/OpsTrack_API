@@ -49,6 +49,7 @@ builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddControllers();
 
 
+//Add authentication for swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
@@ -91,6 +92,8 @@ using (var scope = app.Services.CreateScope())
 // Enable swagger
 app.UseSwagger();
 app.UseSwaggerUI();
+
+//Use middleware for API key
 app.UseMiddleware<ApiKeyMiddleware>();
 
 app.MapControllers();
