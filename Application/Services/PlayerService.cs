@@ -24,10 +24,10 @@ namespace Application.Services
             var players = await _playerRepository.GetAllAsync();
 
             return players.Select(p => new PlayerResponse(
-                p.LastKnownName,
-                p.GameIdentity,
-                p.FirstSeen,
-                p.LastSeen
+                GameIdentity: p.GameIdentity,
+                LastKnownName: p.LastKnownName,
+                FirstSeen: p.FirstSeen,
+                LastSeen: p.LastSeen
                 ));
         }
 

@@ -3,6 +3,8 @@ using Domain.Repositories;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using OpsTrack_API.Middleware;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,6 +47,36 @@ builder.Services.AddScoped<IConnectionEventRepository, EfConnectionEventReposito
 builder.Services.AddScoped<IConnectionEventService, ConnectionEventService>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddControllers();
+
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+    {
+        Description = "API Key needed to access POST endpoints",
+        In = ParameterLocation.Header,
+        Name = "X-Api-Key",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "ApiKeyScheme"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "ApiKey"
+                }
+            },
+            new List<string>()
+        }
+    });
+});
+
+
 var app = builder.Build();
 
 app.UseDeveloperExceptionPage();
@@ -59,6 +91,7 @@ using (var scope = app.Services.CreateScope())
 // Enable swagger
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseMiddleware<ApiKeyMiddleware>();
 
 app.MapControllers();
 
