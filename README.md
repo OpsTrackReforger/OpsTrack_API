@@ -31,5 +31,3 @@ ApiKey - Environment variable - Must be set (-e ApiKey="....")
 
 **CI/CD**
 Github actions builds docker image and pushes to registry when pushes are made to master.
-
-```
