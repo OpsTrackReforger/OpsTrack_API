@@ -1,0 +1,34 @@
+name: Build and Publish API
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Install EF Tools
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Run migrations (SQLite file)
+        run: dotnet ef database update --project Infrastructure --startup-project Opstrack_API
+
+      - name: Build Docker image
+        run: docker build -t opstrack_api:latest .
