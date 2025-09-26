@@ -45,6 +45,7 @@ else
 }
 
 // Add repositories and services
+builder.Services.AddScoped<IEventRepository, EfEventRepository>();
 builder.Services.AddScoped<IPlayerRepository, EfPlayerRepository>();
 builder.Services.AddScoped<IConnectionEventRepository, EfConnectionEventRepository>();
 builder.Services.AddScoped<IConnectionEventService, ConnectionEventService>();

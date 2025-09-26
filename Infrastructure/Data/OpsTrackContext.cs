@@ -24,17 +24,6 @@ namespace Infrastructure.Data
             modelBuilder.Entity<Player>()
                 .HasKey(p => p.GameIdentity);
 
-            //ConnectionEvent
-            modelBuilder.Entity<ConnectionEvent>()
-                .HasKey(e => e.EventId);
-
-            modelBuilder.Entity<ConnectionEvent>()
-                .HasOne(e => e.Player)
-                .WithMany(p => p.ConnectionEvents)
-                .HasForeignKey(e => e.GameIdentity)
-                .HasPrincipalKey(p => p.GameIdentity)
-                .OnDelete(DeleteBehavior.Cascade);
-
             modelBuilder.Entity<EventType>()
                 .HasKey(et => et.eventTypeId);
 
