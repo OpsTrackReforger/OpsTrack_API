@@ -1,30 +1,34 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
-
-# This stage is used to build the service project
+# ---- BUILD STAGE ----
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["OpsTrack_API/OpsTrack_API.csproj", "OpsTrack_API/"]
-RUN dotnet restore "./OpsTrack_API/OpsTrack_API.csproj"
+
+# 1. Copy solution + csproj files for caching
+COPY OpsTrack_API.sln .
+COPY OpsTrack_API/OpsTrack_API.csproj OpsTrack_API/
+COPY Domain/Domain.csproj Domain/
+COPY Application/Application.csproj Application/
+COPY Infrastructure/Infrastructure.csproj Infrastructure/
+
+# 2. Restore dependencies
+RUN dotnet restore
+
+# 3. Copy rest of the source code
 COPY . .
-WORKDIR "/src/OpsTrack_API"
-RUN dotnet build "./OpsTrack_API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./OpsTrack_API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# 4. Publish the API project
+RUN dotnet publish OpsTrack_API/OpsTrack_API.csproj -c Release -o /app/publish
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
+# ---- RUNTIME STAGE ----
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+# Copy published files
+COPY --from=build /app/publish .
+
+# Create folder for SQLite
+RUN mkdir -p /app/Data
+
+EXPOSE 8080
+
+# Start the API
 ENTRYPOINT ["dotnet", "OpsTrack_API.dll"]

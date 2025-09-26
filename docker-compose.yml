@@ -1,6 +1,15 @@
+version: "3.9"
+
 services:
   opstrack_api:
-    image: ${DOCKER_REGISTRY-}opstrackapi
     build:
       context: .
-      dockerfile: OpsTrack_API/Dockerfile
+      dockerfile: Opstrack_API/Dockerfile
+    container_name: opstrack_api
+    ports:
+      - "5000:8080"
+    volumes:
+      - sqlite_data:/app/Data
+
+volumes:
+  sqlite_data:

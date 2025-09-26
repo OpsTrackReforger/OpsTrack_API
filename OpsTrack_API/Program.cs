@@ -6,17 +6,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using OpsTrack_API.Middleware;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-
+// Bind Kestrel til alle interfaces (docker)
+builder.WebHost.UseUrls("http://+:8080");
 
 // Add services to the container.
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Database provider
 var provider = builder.Configuration["DatabaseProvider"];
-
 if (provider == "MySql")
 {
     var cs = builder.Configuration.GetConnectionString("MySql");
@@ -29,27 +30,23 @@ else if (provider == "SqlServer")
     builder.Services.AddDbContext<OpsTrackContext>(options =>
         options.UseSqlServer(cs));
 }
-else // default til Sqlite
+else
 {
-    //SqLite datapath is always in solution folder /Data
-    var solutionRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\.."));
-    var dataPath = Path.Combine(solutionRoot, "Data");
+    // Docker volume path
+    var dataPath = Path.Combine(AppContext.BaseDirectory, "Data");
     Directory.CreateDirectory(dataPath);
     var connectionString = $"Data Source={Path.Combine(dataPath, "opstrack.db")}";
-
     builder.Services.AddDbContext<OpsTrackContext>(options =>
         options.UseSqlite(connectionString));
 }
 
-//Add repositories and services
+// Add repositories and services
 builder.Services.AddScoped<IPlayerRepository, EfPlayerRepository>();
 builder.Services.AddScoped<IConnectionEventRepository, EfConnectionEventRepository>();
 builder.Services.AddScoped<IConnectionEventService, ConnectionEventService>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
-builder.Services.AddControllers();
 
-
-//Add authentication for swagger
+// Swagger with API key
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
@@ -60,7 +57,6 @@ builder.Services.AddSwaggerGen(c =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = "ApiKeyScheme"
     });
-
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -77,9 +73,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
 var app = builder.Build();
 
+// Dev exception page
 app.UseDeveloperExceptionPage();
 
 // Run migrations at startup
@@ -93,7 +89,7 @@ using (var scope = app.Services.CreateScope())
 app.UseSwagger();
 app.UseSwaggerUI();
 
-//Use middleware for API key
+// Middleware for API key
 app.UseMiddleware<ApiKeyMiddleware>();
 
 app.MapControllers();
