@@ -29,6 +29,11 @@ namespace Infrastructure.Data
                 .HasForeignKey(e => e.GameIdentity)
                 .HasPrincipalKey(p => p.GameIdentity)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<EventType>()
+                .HasKey(et => et.eventTypeId);
+
+
         }
     }
 }
