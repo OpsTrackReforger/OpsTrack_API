@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Pomelo.EntityFrameworkCore.MySql;
+using System;
 
 namespace Infrastructure.Data
 {
@@ -17,6 +18,8 @@ namespace Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(OpsTrackContext).Assembly);
             //Player
             modelBuilder.Entity<Player>()
                 .HasKey(p => p.GameIdentity);
@@ -50,6 +53,9 @@ namespace Infrastructure.Data
                        .HasForeignKey(e => e.EventTypeId)
                        .OnDelete(DeleteBehavior.Restrict);
             });
+
+
+
         }
     }
 }
