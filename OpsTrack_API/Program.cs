@@ -16,6 +16,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Hent API nøgle fra miljøvariabel
+var apiKey = builder.Configuration["ApiKey"] ?? throw new InvalidOperationException("API key not set in environment variables.");
+
+
 // Database provider
 var provider = builder.Configuration["DatabaseProvider"];
 if (provider == "MySql")

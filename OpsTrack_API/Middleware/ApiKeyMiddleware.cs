@@ -1,38 +1,26 @@
-﻿namespace OpsTrack_API.Middleware
+﻿
+namespace OpsTrack_API.Middleware;
+public class ApiKeyMiddleware
 {
-    public class ApiKeyMiddleware
+    private readonly RequestDelegate _next;
+    private readonly string _apiKey;
+
+    public ApiKeyMiddleware(RequestDelegate next, IConfiguration config)
     {
-        private readonly RequestDelegate _next;
-        private const string HeaderName = "X-Api-Key";
-
-        public ApiKeyMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
-        public async Task InvokeAsync(HttpContext context, IConfiguration config)
-        {
-            // Kun POST skal kræve nøgle
-            if (context.Request.Method == HttpMethods.Post)
-            {
-                if (!context.Request.Headers.TryGetValue(HeaderName, out var extractedApiKey))
-                {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    await context.Response.WriteAsync("API Key missing");
-                    return;
-                }
-
-                var apiKey = config.GetValue<string>("ApiKey");
-                if (!apiKey.Equals(extractedApiKey))
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    await context.Response.WriteAsync("Unauthorized client");
-                    return;
-                }
-            }
-
-            await _next(context);
-        }
+        _next = next;
+        _apiKey = config["ApiKey"] ?? throw new InvalidOperationException("API key not set in environment variables.");
     }
 
+    public async Task InvokeAsync(HttpContext context)
+    {
+        if (!context.Request.Headers.TryGetValue("X-Api-Key", out var extractedApiKey)
+            || extractedApiKey != _apiKey)
+        {
+            context.Response.StatusCode = 401;
+            await context.Response.WriteAsync("Unauthorized: API key missing or invalid");
+            return;
+        }
+
+        await _next(context);
+    }
 }
