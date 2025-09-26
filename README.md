@@ -1,3 +1,8 @@
+**Support**
+Join the discord: https://discord.gg/w9Gf3twcUn
+Or create an issue
+
+
 **Description**
 OpsTrack_API is a WebAPI including SqLite database that can receive, store and deliver game data from the OpsTrack_Reforger mod.
 This is created to be the "middleman" between ArmA: Reforger and other applications that may need information from a game server.
