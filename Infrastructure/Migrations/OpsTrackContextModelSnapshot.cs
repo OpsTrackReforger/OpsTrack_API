@@ -67,7 +67,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("GameIdentity");
 
-                    b.ToTable("ConnectionEvents");
+                    b.ToTable("ConnectionEvent");
                 });
 
             modelBuilder.Entity("Domain.Entities.Event", b =>
@@ -86,7 +86,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("EventTypeId");
 
-                    b.ToTable("Events");
+                    b.ToTable("Event");
                 });
 
             modelBuilder.Entity("Domain.Entities.EventType", b =>
@@ -101,20 +101,23 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("description")
                         .IsRequired()
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.HasKey("eventTypeId");
 
-                    b.ToTable("EventTypes");
+                    b.ToTable("EventType");
                 });
 
             modelBuilder.Entity("Domain.Entities.Player", b =>
                 {
                     b.Property<string>("GameIdentity")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FirstSeen")
@@ -122,6 +125,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("LastKnownName")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("LastSeen")
@@ -129,15 +133,15 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("GameIdentity");
 
-                    b.ToTable("Players");
+                    b.ToTable("Player");
                 });
 
             modelBuilder.Entity("Domain.Entities.CombatEvent", b =>
                 {
                     b.HasOne("Domain.Entities.Player", "Actor")
-                        .WithMany()
+                        .WithMany("CombatEventsAsActor")
                         .HasForeignKey("ActorId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Event", "Event")
@@ -147,9 +151,9 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Player", "Victim")
-                        .WithMany()
+                        .WithMany("CombatEventsAsVictim")
                         .HasForeignKey("VictimId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Actor");
@@ -191,6 +195,10 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Player", b =>
                 {
+                    b.Navigation("CombatEventsAsActor");
+
+                    b.Navigation("CombatEventsAsVictim");
+
                     b.Navigation("ConnectionEvents");
                 });
 #pragma warning restore 612, 618
