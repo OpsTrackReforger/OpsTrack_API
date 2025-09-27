@@ -20,6 +20,7 @@ namespace Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(OpsTrackContext).Assembly);
+
             //Player
             modelBuilder.Entity<Player>()
                 .HasKey(p => p.GameIdentity);
@@ -27,21 +28,7 @@ namespace Infrastructure.Data
             modelBuilder.Entity<EventType>()
                 .HasKey(et => et.eventTypeId);
 
-            modelBuilder.Entity<Event>(builder =>
-            {
-                //Primary key
-                builder.HasKey(e => e.EventId);
 
-                //Required fields
-                builder.Property(e => e.TimeStamp)
-                    .IsRequired();
-
-                //Relations to EventType
-                builder.HasOne(e => e.EventType)
-                       .WithMany()
-                       .HasForeignKey(e => e.EventTypeId)
-                       .OnDelete(DeleteBehavior.Restrict);
-            });
 
 
 
