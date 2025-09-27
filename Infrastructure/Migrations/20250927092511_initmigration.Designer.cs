@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(OpsTrackContext))]
-    [Migration("20250926202743_InitCombatEvents")]
-    partial class InitCombatEvents
+    [Migration("20250927092511_initmigration")]
+    partial class initmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,12 +55,7 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.ConnectionEvent", b =>
                 {
                     b.Property<int>("EventId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("EventType")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("GameIdentity")
                         .IsRequired()
@@ -68,16 +63,14 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("Timestamp")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.HasKey("EventId");
 
                     b.HasIndex("GameIdentity");
 
-                    b.ToTable("ConnectionEvents");
+                    b.ToTable("ConnectionEvent");
                 });
 
             modelBuilder.Entity("Domain.Entities.Event", b =>
@@ -96,7 +89,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("EventTypeId");
 
-                    b.ToTable("Events");
+                    b.ToTable("Event");
                 });
 
             modelBuilder.Entity("Domain.Entities.EventType", b =>
@@ -111,20 +104,23 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("description")
                         .IsRequired()
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.HasKey("eventTypeId");
 
-                    b.ToTable("EventTypes");
+                    b.ToTable("EventType");
                 });
 
             modelBuilder.Entity("Domain.Entities.Player", b =>
                 {
                     b.Property<string>("GameIdentity")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FirstSeen")
@@ -132,6 +128,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("LastKnownName")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("LastSeen")
@@ -139,15 +136,15 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("GameIdentity");
 
-                    b.ToTable("Players");
+                    b.ToTable("Player");
                 });
 
             modelBuilder.Entity("Domain.Entities.CombatEvent", b =>
                 {
                     b.HasOne("Domain.Entities.Player", "Actor")
-                        .WithMany()
+                        .WithMany("CombatEventsAsActor")
                         .HasForeignKey("ActorId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Event", "Event")
@@ -157,9 +154,9 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Player", "Victim")
-                        .WithMany()
+                        .WithMany("CombatEventsAsVictim")
                         .HasForeignKey("VictimId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Actor");
@@ -171,11 +168,19 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.ConnectionEvent", b =>
                 {
+                    b.HasOne("Domain.Entities.Event", "Event")
+                        .WithOne()
+                        .HasForeignKey("Domain.Entities.ConnectionEvent", "EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.Player", "Player")
                         .WithMany("ConnectionEvents")
                         .HasForeignKey("GameIdentity")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Event");
 
                     b.Navigation("Player");
                 });
@@ -193,6 +198,10 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Player", b =>
                 {
+                    b.Navigation("CombatEventsAsActor");
+
+                    b.Navigation("CombatEventsAsVictim");
+
                     b.Navigation("ConnectionEvents");
                 });
 #pragma warning restore 612, 618

@@ -22,16 +22,18 @@ namespace Infrastructure.Configurations
                 .OnDelete(DeleteBehavior.Cascade);
 
             //Relations to Actor (nullable)
-            builder.HasOne(ce => ce.Actor)
-                .WithMany() //Player doesnt know CombatEvents
-                .HasForeignKey(ce => ce.ActorId)
-                .OnDelete(DeleteBehavior.SetNull);
+            builder.HasOne(c => c.Actor)
+                   .WithMany(p => p.CombatEventsAsActor)
+                   .HasForeignKey(c => c.ActorId)
+                   .HasPrincipalKey(p => p.GameIdentity)
+                   .OnDelete(DeleteBehavior.Restrict);
 
             //Relations to Victim (nullable)
-            builder.HasOne(ce => ce.Victim)
-                .WithMany() //Player doesnt know CombatEvents
-                .HasForeignKey(ce => ce.VictimId)
-                .OnDelete(DeleteBehavior.SetNull);
+            builder.HasOne(c => c.Victim)
+                   .WithMany(p => p.CombatEventsAsVictim)
+                   .HasForeignKey(c => c.VictimId)
+                   .HasPrincipalKey(p => p.GameIdentity)
+                   .OnDelete(DeleteBehavior.Restrict);
 
             //Fields
             builder.Property(ce => ce.Weapon)

@@ -8,10 +8,12 @@ namespace Infrastructure.Data
 {
     public class OpsTrackContext : DbContext
     {
-        public DbSet<ConnectionEvent> ConnectionEvents => Set<ConnectionEvent>();
-        public DbSet<Player> Players => Set<Player>();
-        public DbSet<EventType> EventTypes => Set<EventType>();
-        public DbSet<Event> Events => Set<Event>();
+        public DbSet<ConnectionEvent> ConnectionEvent => Set<ConnectionEvent>();
+        public DbSet<Player> Player => Set<Player>();
+        public DbSet<EventType> EventType => Set<EventType>();
+        public DbSet<Event> Event => Set<Event>();
+        public DbSet<CombatEvent> CombatEvent => Set<CombatEvent>();
+
 
         public OpsTrackContext(DbContextOptions<OpsTrackContext> options) : base(options) { }
 

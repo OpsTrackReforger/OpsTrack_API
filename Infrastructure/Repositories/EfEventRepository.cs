@@ -20,19 +20,19 @@ namespace Infrastructure.Repositories
         }
 
         public async Task<Event?> GetByIdAsync(int eventId) =>
-            await _context.Events
+            await _context.Event
                 .Include(e => e.EventType)
                 .FirstOrDefaultAsync(e => e.EventId == eventId);
 
         public async Task<IEnumerable<Event>> GetAllAsync() =>
-            await _context.Events
+            await _context.Event
                 .Include(e => e.EventType)
                 .OrderByDescending(e => e.TimeStamp)
                 .AsNoTracking()
                 .ToListAsync();
 
         public async Task<IEnumerable<Event>> GetByTypeAsync(int eventTypeId) =>
-            await _context.Events
+            await _context.Event
                 .Include(e => e.EventType)
                 .Where(e => e.EventTypeId == eventTypeId)
                 .OrderByDescending(e => e.TimeStamp)
@@ -40,7 +40,7 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
 
         public async Task AddAsync(Event ev) =>
-            await _context.Events.AddAsync(ev);
+            await _context.Event.AddAsync(ev);
 
         public async Task SaveChangesAsync() =>
             await _context.SaveChangesAsync();
