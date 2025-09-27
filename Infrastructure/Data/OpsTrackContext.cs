@@ -20,18 +20,6 @@ namespace Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(OpsTrackContext).Assembly);
-
-            //Player
-            modelBuilder.Entity<Player>()
-                .HasKey(p => p.GameIdentity);
-
-            modelBuilder.Entity<EventType>()
-                .HasKey(et => et.eventTypeId);
-
-
-
-
-
         }
     }
 }

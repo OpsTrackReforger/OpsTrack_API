@@ -17,8 +17,8 @@ namespace Domain.Entities
 
 
         // Navigation properties
-        public Player Actor { get; set; } //Can be null if ai/environment
-        public Player Victim { get; set; } //Can be null if ai/environment
+        public Player? Actor { get; set; } //Can be null if ai/environment
+        public Player? Victim { get; set; } //Can be null if ai/environment
         public Event Event { get; set; } = null!;
     }
 }
