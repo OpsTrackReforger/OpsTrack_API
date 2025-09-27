@@ -69,6 +69,8 @@ namespace Application.Services
             await _eventRepository.SaveChangesAsync();
             await _connectionEventRepository.SaveChangesAsync();
 
+            ev.EventType = await _eventRepository.GetEventTypeByIdAsync(ev.EventTypeId);
+
             return new ConnectionEventResponse(
                 connEvent.EventId,
                 connEvent.GameIdentity,

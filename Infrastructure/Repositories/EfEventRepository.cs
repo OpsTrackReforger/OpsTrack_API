@@ -45,5 +45,9 @@ namespace Infrastructure.Repositories
         public async Task SaveChangesAsync() =>
             await _context.SaveChangesAsync();
 
+        public async Task<EventType?> GetEventTypeByIdAsync(int eventTypeId) =>
+            await _context.EventType.FindAsync(eventTypeId);
+
+
     }
 }

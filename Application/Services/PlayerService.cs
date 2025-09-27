@@ -1,4 +1,5 @@
 ﻿using Application.Dtos;
+using Application.Enums;
 using Domain.Repositories;
 using System;
 using System.Collections.Generic;
@@ -36,12 +37,12 @@ namespace Application.Services
             var latestEvents = await _eventRepository.GetLatestEventsByPlayerAsync();
 
             var onlinePlayers = latestEvents
-                .Where(e => e != null && e.Event.EventType.name == "join") // kun spillere der sidst joinede
+                .Where(e => e != null && e.Event.EventTypeId != (int)ConnectionEventType.LEAVE)
                 .Select(e => new PlayerResponse(
                     e.GameIdentity,
                     e.Name,
-                    e.Event.TimeStamp, // evt. FirstSeen kan hentes fra Player
-                    e.Event.TimeStamp  // LastSeen, kan også hentes fra Player
+                    e.Player?.FirstSeen ?? e.Event.TimeStamp,
+                    e.Player?.LastSeen ?? e.Event.TimeStamp
                 ));
 
             return onlinePlayers;

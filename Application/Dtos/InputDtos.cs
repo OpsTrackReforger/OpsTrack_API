@@ -7,4 +7,13 @@ using System.Threading.Tasks;
 namespace Application.Dtos
 {
     public record PlayerEventRequest(string GameIdentity, string Name);
+    public record CombatEventRequest(
+        int EventTypeId,
+        string ActorId,
+        string VictimId,
+        string? Weapon,
+        int Distance,
+        bool IsTeamKill
+    );
+
 }

@@ -13,29 +13,31 @@ namespace Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<CombatEvent> builder)
         {
-            //primary key also foreign key to Event
+            // Primary key also foreign key to Event
             builder.HasKey(ce => ce.EventId);
 
             builder.HasOne(c => c.Event)
-                .WithOne() //Event doesnt know CombatEvent
+                .WithOne() // Event doesn't know CombatEvent
                 .HasForeignKey<CombatEvent>(ce => ce.EventId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //Relations to Actor (nullable)
+            // Actor (nullable)
             builder.HasOne(c => c.Actor)
-                   .WithMany(p => p.CombatEventsAsActor)
-                   .HasForeignKey(c => c.ActorId)
-                   .HasPrincipalKey(p => p.GameIdentity)
-                   .OnDelete(DeleteBehavior.Restrict);
+                .WithMany(p => p.CombatEventsAsActor)
+                .HasForeignKey(c => c.ActorId)
+                .HasPrincipalKey(p => p.GameIdentity)
+                .IsRequired(false) // ← Dette er vigtigt!
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //Relations to Victim (nullable)
+            // Victim (nullable)
             builder.HasOne(c => c.Victim)
-                   .WithMany(p => p.CombatEventsAsVictim)
-                   .HasForeignKey(c => c.VictimId)
-                   .HasPrincipalKey(p => p.GameIdentity)
-                   .OnDelete(DeleteBehavior.Restrict);
+                .WithMany(p => p.CombatEventsAsVictim)
+                .HasForeignKey(c => c.VictimId)
+                .HasPrincipalKey(p => p.GameIdentity)
+                .IsRequired(false) // ← Dette er vigtigt!
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //Fields
+            // Fields
             builder.Property(ce => ce.Weapon)
                 .HasMaxLength(100)
                 .IsRequired(false);
@@ -47,4 +49,5 @@ namespace Infrastructure.Configurations
                 .IsRequired();
         }
     }
+
 }
