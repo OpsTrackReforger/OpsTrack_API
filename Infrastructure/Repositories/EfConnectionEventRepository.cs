@@ -21,7 +21,7 @@ namespace Infrastructure.Repositories
                 .Include(e => e.Player)
                 .FirstOrDefaultAsync(e => e.EventId == eventId);
 
-        public async Task<IEnumerable<ConnectionEvent>> GetByPlayerIdAsync(string gameIdentity) =>
+        public async Task<IEnumerable<ConnectionEvent>> GetByPlayerGameIdentityAsync(string gameIdentity) =>
             await _context.ConnectionEvent
                 .Include(e => e.Event)
                     .ThenInclude(ev => ev.EventType)
