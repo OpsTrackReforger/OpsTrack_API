@@ -21,6 +21,32 @@ namespace Test.TestFixtures
             Context = new OpsTrackContext(options);
             Context.Database.EnsureCreated();
         }
+        public OpsTrackContext CreateContext()
+        {
+            var options = new DbContextOptionsBuilder<OpsTrackContext>()
+                .UseSqlite(_connection)
+                .Options;
+
+            var context = new OpsTrackContext(options);
+            context.Database.EnsureCreated();
+            return context;
+        }
+
+        public OpsTrackContext CreateIsolatedContext()
+        {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+
+            var options = new DbContextOptionsBuilder<OpsTrackContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            var context = new OpsTrackContext(options);
+            context.Database.EnsureCreated();
+            return context;
+        }
+
+
 
         public void Dispose()
         {

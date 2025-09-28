@@ -1,7 +1,6 @@
 ﻿using Domain.Entities;
 using Infrastructure.Repositories;
 using Test.TestFixtures;
-using Xunit;
 
 namespace OpsTrack.Test.ConnectionEvents;
 
@@ -18,7 +17,7 @@ public class ConnectionEventRepositoryTests : IClassFixture<SqLiteInMemoryTestFi
     public async Task CanAddAndRetrieveByEventIdConnectionEvent()
     {
         // Arrange
-        var context = _fixture.Context;
+        var context = _fixture.CreateIsolatedContext();
         var repo = new EfConnectionEventRepository(context);
 
         var eventType = new EventType 
@@ -69,7 +68,7 @@ public class ConnectionEventRepositoryTests : IClassFixture<SqLiteInMemoryTestFi
     public void CanAddAndRetrieveByPlayerGameIdentityConnectionEvent()
     {
         // Arrange
-        var context = _fixture.Context;
+        var context = _fixture.CreateIsolatedContext();
         var repo = new EfConnectionEventRepository(context);
         var eventType = new EventType 
         { 
@@ -113,7 +112,7 @@ public class ConnectionEventRepositoryTests : IClassFixture<SqLiteInMemoryTestFi
     public void CanAddAndRetrieveLatestConnectionEvents()
     {
         // Arrange
-        var context = _fixture.Context;
+        var context = _fixture.CreateIsolatedContext();
         var repo = new EfConnectionEventRepository(context);
         var eventType = new EventType 
         { 
@@ -157,5 +156,144 @@ public class ConnectionEventRepositoryTests : IClassFixture<SqLiteInMemoryTestFi
         Assert.Equal("TestPlayer2", latestThree[2].Name);
     }
 
+    [Fact]
+    public async Task GetLatestEventsByPlayerAsync_ReturnsLatestEventPerPlayer()
+    {
+        using var context = _fixture.CreateIsolatedContext();
+        var repo = new EfConnectionEventRepository(context);
+
+        // Arrange
+        var eventType = new EventType 
+        { 
+            name = "Join",
+            category = "Connection",
+            description = "Player joined the game"
+        };
+
+        context.EventType.Add(eventType);
+        await context.SaveChangesAsync();
+
+        // Player A med to events
+        var playerA = new Player 
+        {
+            GameIdentity = "A",
+            LastKnownName = "Alpha" 
+        };
+
+        var oldEventA = new Event 
+        {
+            TimeStamp = DateTime.UtcNow.AddMinutes(-10),
+            EventType = eventType 
+        };
+
+        var newEventA = new Event 
+        {
+            TimeStamp = DateTime.UtcNow,
+            EventType = eventType 
+        };
+
+        context.Event.AddRange(oldEventA, newEventA);
+        await context.SaveChangesAsync();
+
+        context.ConnectionEvent.AddRange(
+            new ConnectionEvent 
+            { Name = "Alpha",
+                Player = playerA,
+                Event = oldEventA 
+            },
+
+            new ConnectionEvent 
+            { 
+                Name = "Alpha",
+                Player = playerA,
+                Event = newEventA 
+            }
+        );
+
+        // Player B med ét event
+        var playerB = new Player 
+        {
+            GameIdentity = "B",
+            LastKnownName = "Bravo" 
+        };
+
+        var eventB = new Event 
+        { 
+            TimeStamp = DateTime.UtcNow.AddMinutes(-5),
+            EventType = eventType
+        };
+
+        context.Event.Add(eventB);
+        await context.SaveChangesAsync();
+
+        context.ConnectionEvent.Add(
+            new ConnectionEvent 
+            { 
+                Name = "Bravo",
+                Player = playerB,
+                Event = eventB
+            }
+        );
+
+        await context.SaveChangesAsync();
+
+        // Act
+        var latestPerPlayer = (await repo.GetLatestEventsByPlayerAsync()).ToList();
+
+        // Assert
+        Assert.Equal(2, latestPerPlayer.Count); // én pr. spiller
+        var latestA = latestPerPlayer.First(e => e.GameIdentity == "A");
+        Assert.Equal(newEventA.EventId, latestA.EventId); // det nyeste for A
+        var latestB = latestPerPlayer.First(e => e.GameIdentity == "B");
+        Assert.Equal(eventB.EventId, latestB.EventId); // det eneste for B
+        Assert.Equal("Join", latestA.Event.EventType.name); // navigation er med
+    }
+
+    [Fact]
+    public void CanAddAndRetrieveAllConnectionEvents()
+    {
+        // Arrange
+        var context = _fixture.CreateIsolatedContext();
+        var repo = new EfConnectionEventRepository(context);
+        var eventType = new EventType 
+        { 
+            name = "Join",
+            category = "Connection",
+            description = "Player joined the game"
+        };
+        context.EventType.Add(eventType);
+        context.SaveChanges();
+        for (int i = 0; i < 5; i++)
+        {
+            var ev = new Event 
+            {
+                TimeStamp = DateTime.UtcNow.AddMinutes(-i),
+                EventType = eventType
+            };
+            context.Event.Add(ev);
+            context.SaveChanges();
+            var player = new Player 
+            { 
+                GameIdentity = (1234 + i).ToString(), 
+                LastKnownName = "TestPlayer" + i 
+            };
+            var conn = new ConnectionEvent 
+            { 
+                Name = "TestPlayer" + i,
+                Event = ev,
+                Player = player
+            };
+            repo.AddAsync(conn).Wait();
+            repo.SaveChangesAsync().Wait();
+        }
+        // Act
+        var allEvents = repo.GetAllAsync().Result.ToList();
+        // Assert
+        Assert.Equal(5, allEvents.Count);
+        Assert.Equal("TestPlayer0", allEvents[0].Name); // Most recent
+        Assert.Equal("TestPlayer1", allEvents[1].Name);
+        Assert.Equal("TestPlayer2", allEvents[2].Name);
+        Assert.Equal("TestPlayer3", allEvents[3].Name);
+    }
 
 }
