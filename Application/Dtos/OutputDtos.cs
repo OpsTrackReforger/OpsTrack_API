@@ -20,4 +20,17 @@ namespace Application.Dtos
         DateTime FirstSeen,
         DateTime LastSeen
     );
+
+    public record CombatEventResponse(
+        int EventId,
+        string? ActorId,
+        string? ActorName,
+        string? VictimId,
+        string? VictimName,
+        string? Weapon,
+        int Distance,
+        bool IsTeamKill,
+        DateTime TimeStamp,
+        string EventTypeName
+    );
 }

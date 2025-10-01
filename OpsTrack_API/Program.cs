@@ -51,8 +51,13 @@ Console.WriteLine($"SQLite DB path: {connectionString}");
 builder.Services.AddScoped<IEventRepository, EfEventRepository>();
 builder.Services.AddScoped<IPlayerRepository, EfPlayerRepository>();
 builder.Services.AddScoped<IConnectionEventRepository, EfConnectionEventRepository>();
+builder.Services.AddScoped<ICombatEventRepository, EfCombatEventRepository>();
+
 builder.Services.AddScoped<IConnectionEventService, ConnectionEventService>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
+builder.Services.AddScoped<ICombatEventService, CombatEventService>();
+builder.Services.AddScoped<IEventService, EventService>();
+
 
 // Swagger with API key
 builder.Services.AddSwaggerGen(c =>
