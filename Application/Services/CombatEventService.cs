@@ -74,7 +74,7 @@ namespace Application.Services
 
             var combat = new CombatEvent
             {
-                EventId = ev.EventId,
+                Event = ev,
                 ActorId = req.ActorId,
                 VictimId = req.VictimId,
                 Weapon = req.Weapon,
