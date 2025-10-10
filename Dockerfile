@@ -8,7 +8,7 @@ COPY OpsTrack_API/OpsTrack_API.csproj OpsTrack_API/
 COPY Domain/Domain.csproj Domain/
 COPY Application/Application.csproj Application/
 COPY Infrastructure/Infrastructure.csproj Infrastructure/
-COPY Test/Test.csproj
+COPY Test/Test.csproj Test/
 
 # 2. Restore dependencies
 RUN dotnet restore
