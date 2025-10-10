@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(OpsTrackContext))]
-    partial class OpsTrackContextModelSnapshot : ModelSnapshot
+    [Migration("20250927092511_initmigration")]
+    partial class initmigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
@@ -23,6 +26,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ActorId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Distance")
@@ -32,6 +36,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("VictimId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Weapon")
@@ -139,7 +144,8 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.Player", "Actor")
                         .WithMany("CombatEventsAsActor")
                         .HasForeignKey("ActorId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.Event", "Event")
                         .WithOne()
@@ -150,7 +156,8 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.Player", "Victim")
                         .WithMany("CombatEventsAsVictim")
                         .HasForeignKey("VictimId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Actor");
 

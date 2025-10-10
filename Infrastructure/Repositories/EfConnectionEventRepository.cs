@@ -15,37 +15,55 @@ namespace Infrastructure.Repositories
         }
 
         public async Task<ConnectionEvent?> GetByIdAsync(int eventId) =>
-            await _context.ConnectionEvents.FindAsync(eventId);
+            await _context.ConnectionEvent
+                .Include(e => e.Event)
+                    .ThenInclude(ev => ev.EventType)
+                .Include(e => e.Player)
+                .FirstOrDefaultAsync(e => e.EventId == eventId);
 
-        public async Task<IEnumerable<ConnectionEvent>> GetByPlayerIdAsync(string gameIdentity) =>
-            await _context.ConnectionEvents
+        public async Task<IEnumerable<ConnectionEvent>> GetByPlayerGameIdentityAsync(string gameIdentity) =>
+            await _context.ConnectionEvent
+                .Include(e => e.Event)
+                    .ThenInclude(ev => ev.EventType)
                 .Where(e => e.GameIdentity == gameIdentity)
                 .AsNoTracking()
                 .ToListAsync();
 
         public async Task<IEnumerable<ConnectionEvent>> GetLatestAsync(int count) =>
-            await _context.ConnectionEvents
-                .OrderByDescending(e => e.Timestamp)
+            await _context.ConnectionEvent
+                .Include(e => e.Event)
+                    .ThenInclude(ev => ev.EventType)
+                .OrderByDescending(e => e.Event.TimeStamp)
                 .Take(count)
                 .AsNoTracking()
                 .ToListAsync();
-        public async Task<IEnumerable<ConnectionEvent>> GetLAtestEventsByPlayerAsync() =>
-            await _context.ConnectionEvents
-                .GroupBy(e => e.GameIdentity)
-                .Select(g => g.OrderByDescending(e => e.Timestamp).FirstOrDefault())
+
+        public async Task<IEnumerable<ConnectionEvent>> GetLatestEventsByPlayerAsync()
+        {
+            var all = await _context.ConnectionEvent
+                .Include(e => e.Event)
+                    .ThenInclude(ev => ev.EventType)
+                .AsNoTracking()
                 .ToListAsync();
 
+            return all
+                .GroupBy(e => e.GameIdentity)
+                .Select(g => g.OrderByDescending(e => e.Event.TimeStamp).FirstOrDefault()!)
+                .ToList();
+        }
+
         public async Task<IEnumerable<ConnectionEvent>> GetAllAsync() =>
-            await _context.ConnectionEvents
-                .OrderByDescending(e => e.Timestamp)
+            await _context.ConnectionEvent
+                .Include(e => e.Event)
+                    .ThenInclude(ev => ev.EventType)
+                .OrderByDescending(e => e.Event.TimeStamp)
                 .AsNoTracking()
                 .ToListAsync();
 
         public async Task AddAsync(ConnectionEvent connectionEvent) =>
-            await _context.ConnectionEvents.AddAsync(connectionEvent);
+            await _context.ConnectionEvent.AddAsync(connectionEvent);
 
         public async Task SaveChangesAsync() =>
             await _context.SaveChangesAsync();
-
     }
 }

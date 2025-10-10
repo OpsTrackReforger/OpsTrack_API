@@ -8,7 +8,7 @@ namespace Application.Enums
 {
     public enum ConnectionEventType
     {
-        JOIN,
-        LEAVE
+        JOIN = 3,
+        LEAVE = 4
     }
 }

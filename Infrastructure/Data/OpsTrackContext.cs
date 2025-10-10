@@ -2,33 +2,26 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Pomelo.EntityFrameworkCore.MySql;
+using System;
 
 namespace Infrastructure.Data
 {
     public class OpsTrackContext : DbContext
     {
-        public DbSet<ConnectionEvent> ConnectionEvents => Set<ConnectionEvent>();
-        public DbSet<Player> Players => Set<Player>();
+        public DbSet<ConnectionEvent> ConnectionEvent => Set<ConnectionEvent>();
+        public DbSet<Player> Player => Set<Player>();
+        public DbSet<EventType> EventType => Set<EventType>();
+        public DbSet<Event> Event => Set<Event>();
+        public DbSet<CombatEvent> CombatEvent => Set<CombatEvent>();
+
 
         public OpsTrackContext(DbContextOptions<OpsTrackContext> options) : base(options) { }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //Player
-            modelBuilder.Entity<Player>()
-                .HasKey(p => p.GameIdentity);
-
-            //ConnectionEvent
-            modelBuilder.Entity<ConnectionEvent>()
-                .HasKey(e => e.EventId);
-
-            modelBuilder.Entity<ConnectionEvent>()
-                .HasOne(e => e.Player)
-                .WithMany(p => p.ConnectionEvents)
-                .HasForeignKey(e => e.GameIdentity)
-                .HasPrincipalKey(p => p.GameIdentity)
-                .OnDelete(DeleteBehavior.Cascade);
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(OpsTrackContext).Assembly);
         }
     }
 }

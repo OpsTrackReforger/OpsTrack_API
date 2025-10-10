@@ -10,5 +10,11 @@
 
         //Navigation propertyfor related connection events
         public ICollection<ConnectionEvent> ConnectionEvents { get; set; } = new List<ConnectionEvent>();
+
+        // Navigation til combat events hvor spilleren var actor
+        public ICollection<CombatEvent> CombatEventsAsActor { get; set; } = new List<CombatEvent>();
+
+        // Navigation til combat events hvor spilleren var victim
+        public ICollection<CombatEvent> CombatEventsAsVictim { get; set; } = new List<CombatEvent>();
     }
 }

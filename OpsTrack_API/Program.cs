@@ -22,33 +22,42 @@ var apiKey = builder.Configuration["ApiKey"] ?? throw new InvalidOperationExcept
 
 // Database provider
 var provider = builder.Configuration["DatabaseProvider"];
+var connectionString = string.Empty;
 if (provider == "MySql")
 {
-    var cs = builder.Configuration.GetConnectionString("MySql");
+    connectionString = builder.Configuration.GetConnectionString("MySql");
     builder.Services.AddDbContext<OpsTrackContext>(options =>
-        options.UseMySql(cs, ServerVersion.AutoDetect(cs)));
+        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 }
 else if (provider == "SqlServer")
 {
-    var cs = builder.Configuration.GetConnectionString("SqlServer");
+    connectionString = builder.Configuration.GetConnectionString("SqlServer");
     builder.Services.AddDbContext<OpsTrackContext>(options =>
-        options.UseSqlServer(cs));
+        options.UseSqlServer(connectionString));
 }
 else
 {
     // Docker volume path
     var dataPath = Path.Combine(AppContext.BaseDirectory, "Data");
     Directory.CreateDirectory(dataPath);
-    var connectionString = $"Data Source={Path.Combine(dataPath, "opstrack.db")}";
+    connectionString = $"Data Source={Path.Combine(dataPath, "opstrack.db")}";
     builder.Services.AddDbContext<OpsTrackContext>(options =>
         options.UseSqlite(connectionString));
 }
 
+Console.WriteLine($"SQLite DB path: {connectionString}");
+
 // Add repositories and services
+builder.Services.AddScoped<IEventRepository, EfEventRepository>();
 builder.Services.AddScoped<IPlayerRepository, EfPlayerRepository>();
 builder.Services.AddScoped<IConnectionEventRepository, EfConnectionEventRepository>();
+builder.Services.AddScoped<ICombatEventRepository, EfCombatEventRepository>();
+
 builder.Services.AddScoped<IConnectionEventService, ConnectionEventService>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
+builder.Services.AddScoped<ICombatEventService, CombatEventService>();
+builder.Services.AddScoped<IEventService, EventService>();
+
 
 // Swagger with API key
 builder.Services.AddSwaggerGen(c =>

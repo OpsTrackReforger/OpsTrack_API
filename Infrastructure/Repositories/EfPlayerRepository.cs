@@ -16,19 +16,19 @@ namespace Infrastructure.Repositories
         }
 
         public async Task<Player?> GetByIdAsync(string gameIdentity) =>
-            await _context.Players.FindAsync(gameIdentity);
+            await _context.Player.FindAsync(gameIdentity);
 
         public async Task<IEnumerable<Player>> GetAllAsync() =>
-            await _context.Players.AsNoTracking().ToListAsync();
+            await _context.Player.AsNoTracking().ToListAsync();
 
         public async Task AddAsync(Player player) =>
-            await _context.Players.AddAsync(player);
+            await _context.Player.AddAsync(player);
 
         
 
         public Task UpdateAsync(Player player)
         {
-            _context.Players.Update(player);
+            _context.Player.Update(player);
             return Task.CompletedTask;
         }
 
