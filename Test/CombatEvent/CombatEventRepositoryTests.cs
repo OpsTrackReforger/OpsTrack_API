@@ -131,6 +131,55 @@ namespace Test.CombatEvents
             Assert.Null(loaded);
         }
 
+        [Fact]
+        public async Task GetByDateAsync_ReturnsFilteredInDescendingOrder()
+        {
+            using var context = _fixture.CreateIsolatedContext();
+            var repo = new EfCombatEventRepository(context);
+            var type = new EventType
+            {
+                name = "Kill",
+                category = "Combat",
+                description = "Entity killed another entity"
+            };
+            context.EventType.Add(type);
+            await context.SaveChangesAsync();
+
+            DateTime now = DateTime.UtcNow;
+
+            for (int i = 0; i < 5; i++)
+            {
+                var ev = new Event
+                {
+                    TimeStamp = now.AddDays(-i),
+                    EventType = type
+                };
+                var actor = new Player
+                {
+                    GameIdentity = $"A{i}",
+                    LastKnownName = $"Actor{i}"
+                };
+                var victim = new Player
+                {
+                    GameIdentity = $"V{i}",
+                    LastKnownName = $"Victim{i}"
+                };
+                var combat = new CombatEvent
+                {
+                    Event = ev,
+                    Actor = actor,
+                    Victim = victim,
+                };
+                await repo.AddAsync(combat);
+                await repo.SaveChangesAsync();
+            }
+            var start = now.AddDays(-3);
+            var end = now;
+            var filtered = (await repo.GetByDateRangeAsync(start, end)).ToList();
+            Assert.Equal(4, filtered.Count); // Days 0,1,2,3
+            Assert.True(filtered[0].Event.TimeStamp > filtered[1].Event.TimeStamp); // descending
+        }
+
 
     }
 }

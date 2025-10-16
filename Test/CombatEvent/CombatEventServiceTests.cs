@@ -118,6 +118,32 @@ namespace Test.CombatEvents
             combatRepo.Verify(r => r.AddAsync(It.IsAny<CombatEvent>()), Times.Once);
             combatRepo.Verify(r => r.SaveChangesAsync(), Times.Once);
         }
+
+        [Fact]
+        public async Task GetCombatEventsByDate_ReturnsListWithinRange()
+        {
+            var start = new DateTime(2025, 1, 1);
+            var end = new DateTime(2025, 12, 31);
+            var events = new List<CombatEvent>
+            {
+                new CombatEvent
+                {
+                    EventId = 1,
+                    Event = new Event
+                    {
+                        TimeStamp = new DateTime(2025, 6, 15),
+                        EventType = new EventType { name = "Kill" }
+                    },
+                    ActorId = "A1",
+                    VictimId = "V1"
+                }
+            };
+            combatRepo.Setup(r => r.GetByDateRangeAsync(start, end)).ReturnsAsync(events);
+            var service = new CombatEventService(combatRepo.Object, eventRepo.Object);
+            var result = (await service.GetByDateRangeAsync(start, end)).ToList();
+            Assert.Single(result);
+            Assert.Equal("Kill", result[0].EventTypeName);
+        }
     }
 
 }

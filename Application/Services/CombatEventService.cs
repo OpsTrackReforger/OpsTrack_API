@@ -102,6 +102,23 @@ namespace Application.Services
             );
         }
 
+        public async Task<IEnumerable<CombatEventResponse>> GetByDateRangeAsync(DateTime start, DateTime end)
+        {
+            var events = await _combatRepo.GetByDateRangeAsync(start, end);
+
+            return events.Select(e => new CombatEventResponse(
+                EventId: e.EventId,
+                ActorId: e.ActorId,
+                ActorName: e.Actor?.LastKnownName ?? "Unknown",
+                VictimId: e.VictimId,
+                VictimName: e.Victim?.LastKnownName ?? "Unknown",
+                Weapon: e.Weapon,
+                Distance: e.Distance,
+                IsTeamKill: e.IsTeamKill,
+                TimeStamp: e.Event.TimeStamp,
+                EventTypeName: e.Event.EventType?.name ?? "Unknown"
+            ));
+        }
     }
 
 }

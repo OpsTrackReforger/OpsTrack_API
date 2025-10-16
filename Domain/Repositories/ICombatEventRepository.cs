@@ -12,6 +12,7 @@ namespace Domain.Repositories
         Task<CombatEvent?> GetByIdAsync(int eventId);
         Task<IEnumerable<CombatEvent>> GetAllAsync();
         Task AddAsync(CombatEvent combatEvent);
+        Task<IEnumerable<CombatEvent>> GetByDateRangeAsync(DateTime start, DateTime end);
         Task SaveChangesAsync();
     }
 }
