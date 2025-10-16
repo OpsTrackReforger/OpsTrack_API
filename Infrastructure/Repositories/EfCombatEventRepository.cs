@@ -37,5 +37,19 @@ namespace Infrastructure.Repositories
 
         public async Task SaveChangesAsync() =>
             await _context.SaveChangesAsync();
+
+        public async Task<IEnumerable<CombatEvent>> GetByDateRangeAsync(DateTime start, DateTime end)
+        {
+
+            return await _context.CombatEvent
+                .Include(c => c.Event)
+                    .ThenInclude(e => e.EventType)
+                .Include(c => c.Actor)
+                .Include(c => c.Victim)
+                .Where(c => c.Event.TimeStamp >= start && c.Event.TimeStamp <= end)
+                .OrderByDescending(c => c.Event.TimeStamp)
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }
