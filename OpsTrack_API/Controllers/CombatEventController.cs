@@ -36,6 +36,17 @@ namespace OpsTrack_API.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// Get combat events within a specified date range.
+        /// </summary>
+        /// <param name="start">
+        /// Start date (inclusive) in ISO 8601 format, e.g., 2023-01-01T00:00:00Z
+        /// </param>
+        /// <param name="end">
+        /// End date (inclusive) in ISO 8601 format, e.g., 2023-01-31T23:59:59Z
+        /// </param>
+        /// <returns></returns>
         [HttpGet("byDate")]
         public async Task<IActionResult> GetByDateRange([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
