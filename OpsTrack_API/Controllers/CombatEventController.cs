@@ -35,6 +35,13 @@ namespace OpsTrack_API.Controllers
             var result = await _combatService.RegisterCombatEventAsync(req);
             return Ok(result);
         }
+
+        [HttpGet("byDate")]
+        public async Task<IActionResult> GetByDateRange([FromQuery] DateTime start, [FromQuery] DateTime end)
+        {
+            var events = await _combatService.GetByDateRangeAsync(start, end);
+            return Ok(events);
+        }
     }
 
 }
