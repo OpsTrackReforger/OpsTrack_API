@@ -1,4 +1,5 @@
 ﻿using Application.Services;
+using Domain.Entities;
 using Domain.Repositories;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
@@ -97,6 +98,24 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<OpsTrackContext>();
     db.Database.Migrate();
 }
+
+//Ensure "Environment" player always exists
+using (var scope = app.Services.CreateScope())
+{
+    var ctx = scope.ServiceProvider.GetRequiredService<OpsTrackContext>();
+    if (!ctx.Player.Any(p => p.GameIdentity == "Environment"))
+    {
+        ctx.Player.Add(new Player
+        {
+            GameIdentity = "Environment",
+            LastKnownName = "Environment",
+            FirstSeen = DateTime.UtcNow,
+            LastSeen = DateTime.UtcNow
+        });
+        ctx.SaveChanges();
+    }
+}
+
 
 // Enable swagger
 app.UseSwagger();

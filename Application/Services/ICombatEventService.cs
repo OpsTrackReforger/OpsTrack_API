@@ -14,6 +14,7 @@ namespace Application.Services
         Task<CombatEventResponse?> GetByIdAsync(int eventId);
         Task<IEnumerable<CombatEventResponse>> GetAllAsync();
         Task<CombatEventResponse> RegisterCombatEventAsync(CombatEventRequest req);
+        Task<IEnumerable<CombatEventResponse>> GetByDateRangeAsync(DateTime start, DateTime end);
     }
 
 }
