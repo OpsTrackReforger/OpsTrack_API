@@ -10,7 +10,9 @@ namespace Application.Dtos
     public record CombatEventRequest(
         int EventTypeId,
         string ActorId,
+        string? ActorFaction,
         string VictimId,
+        string? VictimFaction,
         string? Weapon,
         int Distance,
         bool IsTeamKill

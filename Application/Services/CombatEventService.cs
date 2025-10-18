@@ -53,7 +53,9 @@ namespace Application.Services
             {
                 Event = ev,
                 ActorId = req.ActorId,
+                ActorFaction = req.ActorFaction,
                 VictimId = req.VictimId,
+                VictimFaction = req.VictimFaction,
                 Weapon = req.Weapon,
                 Distance = req.Distance,
                 IsTeamKill = req.IsTeamKill
