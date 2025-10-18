@@ -25,19 +25,7 @@ namespace Application.Services
             var e = await _combatRepo.GetByIdAsync(eventId);
             if (e == null) return null;
 
-            return new CombatEventResponse
-            (
-                EventId: e.EventId,
-                ActorId: e.ActorId,
-                ActorName: e.Actor?.LastKnownName ?? "Unknown",
-                VictimId: e.VictimId,
-                VictimName: e.Victim?.LastKnownName ?? "Unknown",
-                Weapon: e.Weapon,
-                Distance: e.Distance,
-                IsTeamKill: e.IsTeamKill,
-                TimeStamp: e.Event.TimeStamp,
-                EventTypeName: e.Event.EventType?.name ?? "Unknown"
-            );
+            return MapToResponse(e);
         }
 
 
@@ -45,18 +33,7 @@ namespace Application.Services
         {
             var events = await _combatRepo.GetAllAsync();
 
-            return events.Select(e => new CombatEventResponse(
-                EventId: e.EventId,
-                ActorId: e.ActorId,
-                ActorName: e.Actor?.LastKnownName ?? "Unknown",
-                VictimId: e.VictimId,
-                VictimName: e.Victim?.LastKnownName ?? "Unknown",
-                Weapon: e.Weapon,
-                Distance: e.Distance,
-                IsTeamKill: e.IsTeamKill,
-                TimeStamp: e.Event.TimeStamp,
-                EventTypeName: e.Event.EventType?.name ?? "Unknown"
-            ));
+            return events.Select(e => MapToResponse(e));
         }
 
         public async Task<CombatEventResponse> RegisterCombatEventAsync(CombatEventRequest req)
@@ -88,37 +65,35 @@ namespace Application.Services
             // Sørg for at EventType er inkluderet
             ev.EventType = await _eventRepo.GetEventTypeByIdAsync(ev.EventTypeId);
 
-            return new CombatEventResponse(
-                EventId: combat.EventId,
-                ActorId: combat.ActorId,
-                ActorName: combat.Actor?.LastKnownName ?? "Unknown",
-                VictimId: combat.VictimId,
-                VictimName: combat.Victim?.LastKnownName ?? "Unknown",
-                Weapon: combat.Weapon,
-                Distance: combat.Distance,
-                IsTeamKill: combat.IsTeamKill,
-                TimeStamp: combat.Event.TimeStamp,
-                EventTypeName: combat.Event.EventType?.name ?? "Unknown"
-            );
+            return MapToResponse(combat);
         }
 
         public async Task<IEnumerable<CombatEventResponse>> GetByDateRangeAsync(DateTime start, DateTime end)
         {
             var events = await _combatRepo.GetByDateRangeAsync(start, end);
 
-            return events.Select(e => new CombatEventResponse(
+            return events.Select(MapToResponse);
+        }
+
+        private CombatEventResponse MapToResponse(CombatEvent e)
+        {
+            return new CombatEventResponse
+            (
                 EventId: e.EventId,
                 ActorId: e.ActorId,
                 ActorName: e.Actor?.LastKnownName ?? "Unknown",
+                ActorFaction: e.ActorFaction,
                 VictimId: e.VictimId,
                 VictimName: e.Victim?.LastKnownName ?? "Unknown",
+                VictimFaction: e.VictimFaction,
                 Weapon: e.Weapon,
                 Distance: e.Distance,
                 IsTeamKill: e.IsTeamKill,
                 TimeStamp: e.Event.TimeStamp,
                 EventTypeName: e.Event.EventType?.name ?? "Unknown"
-            ));
+            );
         }
+
     }
 
 }
