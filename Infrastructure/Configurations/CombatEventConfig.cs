@@ -55,6 +55,13 @@ namespace Infrastructure.Configurations
             builder.Property(ce => ce.VictimFaction)
                 .HasMaxLength(100)
                 .IsRequired(false);
+
+            builder.Property(ce => ce.ActorName)
+                .HasMaxLength(100)
+                .IsRequired(false);
+            builder.Property(ce => ce.VictimName)
+                .HasMaxLength(100)
+                .IsRequired(false);
         }
     }
 

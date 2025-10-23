@@ -1,6 +1,7 @@
 ﻿using Application.Dtos;
 using Domain.Entities;
 using Domain.Repositories;
+using Domain.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,10 +53,12 @@ namespace Application.Services
             var combat = new CombatEvent
             {
                 Event = ev,
-                ActorId = req.ActorId,
+                ActorId = PlayerHelpers.IsValidPlayerId(req.ActorId) ? req.ActorId : null,
                 ActorFaction = req.ActorFaction,
-                VictimId = req.VictimId,
+                ActorName = req.ActorName,
+                VictimId = PlayerHelpers.IsValidPlayerId(req.VictimId) ? req.VictimId : null,
                 VictimFaction = req.VictimFaction,
+                VictimName = req.VictimName,
                 Weapon = req.Weapon,
                 Distance = req.Distance,
                 IsTeamKill = req.IsTeamKill
@@ -83,10 +86,10 @@ namespace Application.Services
             (
                 EventId: e.EventId,
                 ActorId: e.ActorId,
-                ActorName: e.Actor?.LastKnownName ?? "Unknown",
+                ActorName: e.Actor?.LastKnownName ?? e.ActorName ?? "Unknown",
                 ActorFaction: e.ActorFaction,
                 VictimId: e.VictimId,
-                VictimName: e.Victim?.LastKnownName ?? "Unknown",
+                VictimName: e.Victim?.LastKnownName ?? e.VictimName ?? "Unknown",
                 VictimFaction: e.VictimFaction,
                 Weapon: e.Weapon,
                 Distance: e.Distance,

@@ -95,6 +95,10 @@ namespace Test.CombatEvents
             (
                 EventTypeId: 99,
                 ActorId: "A1",
+                ActorName: "Actor",
+                ActorFaction: "FactionA",
+                VictimFaction: "FactionB",
+                VictimName: "Victim",
                 VictimId: "V1",
                 Weapon: "Sniper",
                 Distance: 200,
